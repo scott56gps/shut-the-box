@@ -104,18 +104,18 @@ const GameView = () => {
         </div>
         <div className="roll-container">
           {roll ? (
-                  <>
-                    <span key="die1" className="die">Die 1: {roll.first}</span>
-                    <span key="die2" className="die">Die 2: {roll.second}</span>
-                  </>
-              ) : (
-                  <button type="button" onClick={handleRoll}>Roll!</button>
-              )}
-            </div>
-            <button onClick={handleReset} type="button">Reset</button>
-          </div>
+            <>
+              <span key="die1" className="die">Die 1: {roll.first}</span>
+              <span key="die2" className="die">Die 2: {roll.second}</span>
+            </>
+          ) : (
+            <button type="button" onClick={handleRoll}>Roll!</button>
+          )}
         </div>
-    );
+        <button onClick={handleReset} type="button">Reset</button>
+      </div>
+    </div>
+  );
 };
 
 export default GameView;
