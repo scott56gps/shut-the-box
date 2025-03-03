@@ -13,6 +13,15 @@ const initialPegs = [
   { isAvailable: true, choiceColor: 'none', number: 7, },
   { isAvailable: true, choiceColor: 'none', number: 8, },
   { isAvailable: true, choiceColor: 'none', number: 9, },
+  { isAvailable: true, choiceColor: 'none', margin: 0, number: 1, },
+  { isAvailable: true, choiceColor: 'none', margin: 0, number: 2, },
+  { isAvailable: true, choiceColor: 'none', margin: 0, number: 3, },
+  { isAvailable: true, choiceColor: 'none', margin: 0, number: 4, },
+  { isAvailable: true, choiceColor: 'none', margin: 0, number: 5, },
+  { isAvailable: true, choiceColor: 'none', margin: 0, number: 6, },
+  { isAvailable: true, choiceColor: 'none', margin: 0, number: 7, },
+  { isAvailable: true, choiceColor: 'none', margin: 0, number: 8, },
+  { isAvailable: true, choiceColor: 'none', margin: 0, number: 9, },
 ];
 
 const GameView = () => {
@@ -28,6 +37,40 @@ const GameView = () => {
     setColors(colors.filter((color) => color !== generatedColor));
     return generatedColor;
   }, [colors]);
+
+  const handleOnMouseEnter = (peg) => {
+    if (roll && peg.choiceColor !== 'none') {
+      console.log("PEG", peg.number)
+      // We want the current peg to have margin
+      peg.margin = '16px';
+
+      // AND its match
+      if (roll.total !== peg.number) {
+        // There is a match to find
+        const pegDifference = roll.total - peg.number - 1;
+        const pegMatch = pegs[pegDifference];
+
+        // If the numbers are 1 away from each other, make the space half as wide
+        pegMatch.margin = pegDifference === 1 ? peg.number > pegMatch.number ? '4px 0 8px' : '8px 0 4px' : '16px';
+
+        console.log("PEG MATCH:", pegMatch.number);
+
+        setPegs(pegs.map((statePeg) => statePeg.number === peg.number ? peg :
+                         statePeg.number === pegMatch.number ? pegMatch : statePeg));
+      } else {
+        setPegs(pegs.map((statePeg) => statePeg.number === peg.number ? peg : statePeg));
+      }
+    }
+  };
+
+  const handleOnMouseLeave = () => {
+    if (pegs) {
+      setPegs(pegs.map((peg) => {
+        peg.margin = '0';
+        return peg;
+      }))
+    }
+  };
 
   const handleRoll = useCallback(() => {
     const firstDie = rollDice(1, 6);
@@ -95,8 +138,10 @@ const GameView = () => {
           {pegs.map((peg, i) => (
             <span
               className={`peg ${peg.isAvailable ? '' : 'selected'}`}
-              style={{ backgroundColor: peg.choiceColor }}
+              style={{ backgroundColor: peg.choiceColor, margin: '0 ' + peg.margin }}
               key={i}
+              onMouseEnter={() => handleOnMouseEnter(peg)}
+              onMouseLeave={handleOnMouseLeave}
             >
               {peg.number}
             </span>
