@@ -15,6 +15,8 @@ const initialPegs = [
   { isAvailable: true, choiceColor: 'none', number: 9, scale: '1' },
 ];
 
+const scaleFactor = 1.3;
+
 const GameView = () => {
   const [roll, setRoll] = useState(undefined);
   const [pegs, setPegs] = useState(initialPegs);
@@ -32,7 +34,7 @@ const GameView = () => {
   const handleOnMouseEnter = (peg) => {
     if (roll && peg.choiceColor !== 'none') {
       // We want the current peg to have margin
-      peg.scale = '1.5';
+      peg.scale = `${scaleFactor}`;
 
       // AND its match
       if (roll.total !== peg.number) {
@@ -41,7 +43,7 @@ const GameView = () => {
         const pegMatch = pegs[pegDifference];
 
         // If the numbers are 1 away from each other, make the space half as wide
-        pegMatch.scale = '1.5';
+        pegMatch.scale = `${scaleFactor}`;
 
         setPegs(pegs.map((statePeg) => statePeg.number === peg.number ? peg :
                          statePeg.number === pegMatch.number ? pegMatch : statePeg));
