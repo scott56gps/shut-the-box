@@ -31,6 +31,26 @@ const GameView = () => {
     return generatedColor;
   }, [colors]);
 
+  const handlePegSelect = (peg) => {
+    if (roll && peg.choiceColor !== 'none') {
+      peg.isAvailable = false;
+
+      if (roll.total !== peg.number) {
+        // There is a match to find
+        const pegDifference = roll.total - peg.number - 1;
+        const pegMatch = pegs[pegDifference];
+
+        // If the numbers are 1 away from each other, make the space half as wide
+        pegMatch.isAvailable = false;
+
+        setPegs(pegs.map((statePeg) => statePeg.number === peg.number ? peg :
+          statePeg.number === pegMatch.number ? pegMatch : statePeg));
+      } else {
+        setPegs(pegs.map((statePeg) => statePeg.number === peg.number ? peg : statePeg));
+      }
+    }
+  }
+
   const handleOnMouseEnter = (peg) => {
     if (roll && peg.choiceColor !== 'none') {
       // We want the current peg to have margin
@@ -128,14 +148,22 @@ const GameView = () => {
     <div className="App">
       <div className="game-board">
         <div className="pegs-container">
-          {pegs.map((peg, i) => (
+          {pegs.filter((peg) => peg.isAvailable).map((peg, i) => (
             <span
-              className={`peg ${peg.isAvailable ? '' : 'selected'}`}
+              className="peg"
               style={{ backgroundColor: peg.choiceColor, transform: `scale(${peg.scale})` }}
               key={i}
+              onClick={() => handlePegSelect(peg)}
               onMouseEnter={() => handleOnMouseEnter(peg)}
               onMouseLeave={handleOnMouseLeave}
             >
+              {peg.number}
+            </span>
+          ))}
+        </div>
+        <div className="selected-pegs-container">
+          {pegs.filter((peg) => !peg.isAvailable).map((peg) => (
+            <span className="peg">
               {peg.number}
             </span>
           ))}
