@@ -4,15 +4,15 @@ import findPairs from '../utils/findPairs';
 import './GameView.css';
 
 const initialPegs = [
-  { isAvailable: true, choiceColor: 'none', margin: 0, number: 1, },
-  { isAvailable: true, choiceColor: 'none', margin: 0, number: 2, },
-  { isAvailable: true, choiceColor: 'none', margin: 0, number: 3, },
-  { isAvailable: true, choiceColor: 'none', margin: 0, number: 4, },
-  { isAvailable: true, choiceColor: 'none', margin: 0, number: 5, },
-  { isAvailable: true, choiceColor: 'none', margin: 0, number: 6, },
-  { isAvailable: true, choiceColor: 'none', margin: 0, number: 7, },
-  { isAvailable: true, choiceColor: 'none', margin: 0, number: 8, },
-  { isAvailable: true, choiceColor: 'none', margin: 0, number: 9, },
+  { isAvailable: true, choiceColor: 'none', number: 1, scale: '1' },
+  { isAvailable: true, choiceColor: 'none', number: 2, scale: '1' },
+  { isAvailable: true, choiceColor: 'none', number: 3, scale: '1' },
+  { isAvailable: true, choiceColor: 'none', number: 4, scale: '1' },
+  { isAvailable: true, choiceColor: 'none', number: 5, scale: '1' },
+  { isAvailable: true, choiceColor: 'none', number: 6, scale: '1' },
+  { isAvailable: true, choiceColor: 'none', number: 7, scale: '1' },
+  { isAvailable: true, choiceColor: 'none', number: 8, scale: '1' },
+  { isAvailable: true, choiceColor: 'none', number: 9, scale: '1' },
 ];
 
 const GameView = () => {
@@ -32,7 +32,7 @@ const GameView = () => {
   const handleOnMouseEnter = (peg) => {
     if (roll && peg.choiceColor !== 'none') {
       // We want the current peg to have margin
-      peg.margin = '16px';
+      peg.scale = '1.5';
 
       // AND its match
       if (roll.total !== peg.number) {
@@ -41,9 +41,7 @@ const GameView = () => {
         const pegMatch = pegs[pegDifference];
 
         // If the numbers are 1 away from each other, make the space half as wide
-        pegMatch.margin = pegDifference === 1 ? peg.number > pegMatch.number ? '4px 0 8px' : '8px 0 4px' : '16px';
-
-        console.log("PEG MATCH:", pegMatch.number);
+        pegMatch.scale = '1.5';
 
         setPegs(pegs.map((statePeg) => statePeg.number === peg.number ? peg :
                          statePeg.number === pegMatch.number ? pegMatch : statePeg));
@@ -56,7 +54,7 @@ const GameView = () => {
   const handleOnMouseLeave = () => {
     if (pegs) {
       setPegs(pegs.map((peg) => {
-        peg.margin = '0';
+        peg.scale = '1';
         return peg;
       }))
     }
@@ -131,7 +129,7 @@ const GameView = () => {
           {pegs.map((peg, i) => (
             <span
               className={`peg ${peg.isAvailable ? '' : 'selected'}`}
-              style={{ backgroundColor: peg.choiceColor, margin: '0 ' + peg.margin }}
+              style={{ backgroundColor: peg.choiceColor, transform: `scale(${peg.scale})` }}
               key={i}
               onMouseEnter={() => handleOnMouseEnter(peg)}
               onMouseLeave={handleOnMouseLeave}
