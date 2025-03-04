@@ -4,15 +4,6 @@ import findPairs from '../utils/findPairs';
 import './GameView.css';
 
 const initialPegs = [
-  { isAvailable: true, choiceColor: 'none', number: 1, },
-  { isAvailable: true, choiceColor: 'none', number: 2, },
-  { isAvailable: true, choiceColor: 'none', number: 3, },
-  { isAvailable: true, choiceColor: 'none', number: 4, },
-  { isAvailable: true, choiceColor: 'none', number: 5, },
-  { isAvailable: true, choiceColor: 'none', number: 6, },
-  { isAvailable: true, choiceColor: 'none', number: 7, },
-  { isAvailable: true, choiceColor: 'none', number: 8, },
-  { isAvailable: true, choiceColor: 'none', number: 9, },
   { isAvailable: true, choiceColor: 'none', margin: 0, number: 1, },
   { isAvailable: true, choiceColor: 'none', margin: 0, number: 2, },
   { isAvailable: true, choiceColor: 'none', margin: 0, number: 3, },
@@ -87,7 +78,7 @@ const GameView = () => {
     var newPegs = [];
     var i = 0;
     var j = 8;
-    while (i < j) {
+    while (i <= j) {
       // If i is the key of an available pair
       if (availablePairs[i]) {
         // Generate a color
@@ -117,12 +108,15 @@ const GameView = () => {
         }
       } else {
         if (i !== 0) {
-          newPegs.push(pegs[i]);
+          newPegs.push(pegs[i-1]);
         }
       }
       i = i + 1;
     }
-    newPegs = newPegs.concat(pegs.slice(i + j));
+
+    // If i is 5, then that means that we are missing the last index of the
+    //  original pegs array: index 8
+    newPegs = newPegs.concat(pegs.slice(i === 5 && j === 4 ? 8 : i + j));
     setPegs(newPegs.sort((peg1, peg2) => peg1.number > peg2.number));
   }, [pegs, generateColor]);
 
