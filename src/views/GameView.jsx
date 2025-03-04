@@ -31,7 +31,6 @@ const GameView = () => {
 
   const handleOnMouseEnter = (peg) => {
     if (roll && peg.choiceColor !== 'none') {
-      console.log("PEG", peg.number)
       // We want the current peg to have margin
       peg.margin = '16px';
 
