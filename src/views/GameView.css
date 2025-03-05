@@ -13,8 +13,12 @@
     justify-content: center;
 }
 
-.pegs-container {
+.pegs-container, .selected-pegs-container {
     display: flex;
+}
+
+.selected-pegs-container {
+  margin-top: 8px;
 }
 
 .peg {
@@ -24,10 +28,6 @@
 
 .option {
     background-color: blue;
-}
-
-.peg:hover {
-    background: red;
 }
 
 .roll-container {

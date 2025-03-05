@@ -148,10 +148,10 @@ const GameView = () => {
     <div className="App">
       <div className="game-board">
         <div className="pegs-container">
-          {pegs.filter((peg) => peg.isAvailable).map((peg, i) => (
+          {pegs.map((peg, i) => (
             <span
               className="peg"
-              style={{ backgroundColor: peg.choiceColor, transform: `scale(${peg.scale})` }}
+              style={{ backgroundColor: peg.choiceColor, opacity: peg.isAvailable ? '100%' : '0', transform: `scale(${peg.scale})` }}
               key={i}
               onClick={() => handlePegSelect(peg)}
               onMouseEnter={() => handleOnMouseEnter(peg)}
@@ -162,8 +162,11 @@ const GameView = () => {
           ))}
         </div>
         <div className="selected-pegs-container">
-          {pegs.filter((peg) => !peg.isAvailable).map((peg) => (
-            <span className="peg">
+          {pegs.map((peg) => (
+            <span
+              className="peg"
+              style={{ opacity: peg.isAvailable ? '0' : '100%' }}
+            >
               {peg.number}
             </span>
           ))}
