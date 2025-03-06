@@ -44,7 +44,8 @@ const GameView = () => {
         pegMatch.isAvailable = false;
 
         setPegs(pegs.map((statePeg) => statePeg.number === peg.number ? peg :
-          statePeg.number === pegMatch.number ? pegMatch : statePeg));
+                         statePeg.number === pegMatch.number ? pegMatch : statePeg));
+        setRoll(undefined);
       } else {
         setPegs(pegs.map((statePeg) => statePeg.number === peg.number ? peg : statePeg));
       }
