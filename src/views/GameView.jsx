@@ -45,10 +45,10 @@ const GameView = () => {
 
         setPegs(pegs.map((statePeg) => statePeg.number === peg.number ? peg :
                          statePeg.number === pegMatch.number ? pegMatch : statePeg));
-        setRoll(undefined);
       } else {
         setPegs(pegs.map((statePeg) => statePeg.number === peg.number ? peg : statePeg));
       }
+      setRoll(undefined);
     }
   }
 
@@ -149,11 +149,11 @@ const GameView = () => {
     <div className="App">
       <div className="game-board">
         <div className="pegs-container">
-          {pegs.map((peg, i) => (
+          {pegs.map((peg) => (
             <span
               className="peg"
               style={{ backgroundColor: peg.choiceColor, opacity: peg.isAvailable ? '100%' : '0', transform: `scale(${peg.scale})` }}
-              key={i}
+              key={peg.number}
               onClick={() => handlePegSelect(peg)}
               onMouseEnter={() => handleOnMouseEnter(peg)}
               onMouseLeave={handleOnMouseLeave}
@@ -166,6 +166,7 @@ const GameView = () => {
           {pegs.map((peg) => (
             <span
               className="peg"
+              key={peg.number}
               style={{ opacity: peg.isAvailable ? '0' : '100%' }}
             >
               {peg.number}
