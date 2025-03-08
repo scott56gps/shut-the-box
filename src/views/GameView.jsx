@@ -4,15 +4,15 @@ import findPairs from '../utils/findPairs';
 import './GameView.css';
 
 const initialPegs = [
-  { isAvailable: true, choiceColor: 'none', number: 1, scale: '1' },
-  { isAvailable: true, choiceColor: 'none', number: 2, scale: '1' },
-  { isAvailable: true, choiceColor: 'none', number: 3, scale: '1' },
-  { isAvailable: true, choiceColor: 'none', number: 4, scale: '1' },
-  { isAvailable: true, choiceColor: 'none', number: 5, scale: '1' },
-  { isAvailable: true, choiceColor: 'none', number: 6, scale: '1' },
-  { isAvailable: true, choiceColor: 'none', number: 7, scale: '1' },
-  { isAvailable: true, choiceColor: 'none', number: 8, scale: '1' },
-  { isAvailable: true, choiceColor: 'none', number: 9, scale: '1' },
+  { isAvailable: true, choiceColor: 'unset', number: 1, scale: '1' },
+  { isAvailable: true, choiceColor: 'unset', number: 2, scale: '1' },
+  { isAvailable: true, choiceColor: 'unset', number: 3, scale: '1' },
+  { isAvailable: true, choiceColor: 'unset', number: 4, scale: '1' },
+  { isAvailable: true, choiceColor: 'unset', number: 5, scale: '1' },
+  { isAvailable: true, choiceColor: 'unset', number: 6, scale: '1' },
+  { isAvailable: true, choiceColor: 'unset', number: 7, scale: '1' },
+  { isAvailable: true, choiceColor: 'unset', number: 8, scale: '1' },
+  { isAvailable: true, choiceColor: 'unset', number: 9, scale: '1' },
 ];
 
 const scaleFactor = 1.3;
@@ -40,13 +40,14 @@ const GameView = () => {
         const pegDifference = roll.total - peg.number - 1;
         const pegMatch = pegs[pegDifference];
 
-        // If the numbers are 1 away from each other, make the space half as wide
         pegMatch.isAvailable = false;
 
-        setPegs(pegs.map((statePeg) => statePeg.number === peg.number ? peg :
-                         statePeg.number === pegMatch.number ? pegMatch : statePeg));
+        setPegs(pegs.map((statePeg) => {
+          return statePeg.number === peg.number ? peg :
+            statePeg.number === pegMatch.number ? pegMatch : { ...statePeg, choiceColor: 'unset' }
+        }));
       } else {
-        setPegs(pegs.map((statePeg) => statePeg.number === peg.number ? peg : statePeg));
+        setPegs(pegs.map((statePeg) => statePeg.number === peg.number ? peg : { ...statePeg, choiceColor: 'unset' }));
       }
       setRoll(undefined);
     }
