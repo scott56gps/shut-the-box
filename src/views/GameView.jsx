@@ -15,21 +15,29 @@ const initialPegs = [
   { isAvailable: true, choiceColor: 'unset', number: 9, scale: '1' },
 ];
 
+const colors = ["#0020FF", "#FF009F", "#FFDF00", "#00FF60", "#00DFFF"];
+
 const scaleFactor = 1.3;
 
 const GameView = () => {
   const [roll, setRoll] = useState(undefined);
   const [pegs, setPegs] = useState(initialPegs);
-  const [colors, setColors] = useState(["#0020FF", "#FF009F", "#FFDF00", "#00FF60", "#00DFFF"]);
 
   const rollDice = (min, max) => min + Math.floor(Math.random() * (max - min + 1));
 
-  const generateColor = useCallback(() => {
-    const randomIndex = rollDice(0, colors.length - 1);
-    const generatedColor = colors[randomIndex];
-    setColors(colors.filter((color) => color !== generatedColor));
-    return generatedColor;
-  }, [colors]);
+  /**
+     Generates a random list of indices from 0 to n.
+   */
+  const generateRandomIndices = (n) => {
+    var arr = [];
+    while (arr.length < n) {
+      var r = Math.floor(Math.random() * n)
+      if (arr.indexOf(r) === -1) {
+        arr.push(r)
+      }
+    }
+    return arr;
+  };
 
   const handlePegSelect = (peg) => {
     if (roll && peg.choiceColor !== 'none') {
@@ -84,7 +92,7 @@ const GameView = () => {
     }
   };
 
-  const handleRoll = useCallback(() => {
+  const handleRoll = () => {
     const firstDie = rollDice(1, 6);
     const secondDie = rollDice(1, 6);
     const availablePairs = findPairs(firstDie + secondDie, pegs);
@@ -97,13 +105,14 @@ const GameView = () => {
 
     // Modify the pegs to indicate the available choices
     var newPegs = [];
+    var colorIndices = generateRandomIndices(colors.length-1);
     var i = 0;
     var j = 8;
     while (i <= j) {
       // If i is the key of an available pair
       if (availablePairs[i]) {
         // Generate a color
-        const generatedColor = generateColor();
+        const generatedColor = colors[colorIndices.pop()];
 
         // indicate a pair match IFF i != 0
         if (i !== 0) {
@@ -139,12 +148,12 @@ const GameView = () => {
     //  original pegs array: index 8
     newPegs = newPegs.concat(pegs.slice(i === 5 && j === 4 ? 8 : i + j));
     setPegs(newPegs.sort((peg1, peg2) => peg1.number > peg2.number));
-  }, [pegs, generateColor]);
+  };
 
-  const handleReset = useCallback(() => {
+  const handleReset = () => {
     setRoll(undefined);
     setPegs(initialPegs);
-  }, []);
+  };
 
   return (
     <div className="App">
