@@ -3,16 +3,18 @@ import React, { useCallback, useState } from 'react';
 import findPairs from '../utils/findPairs';
 import './GameView.css';
 
+const UNSET = 'unset';
+
 const initialPegs = [
-  { isAvailable: true, choiceColor: 'unset', number: 1, scale: '1' },
-  { isAvailable: true, choiceColor: 'unset', number: 2, scale: '1' },
-  { isAvailable: true, choiceColor: 'unset', number: 3, scale: '1' },
-  { isAvailable: true, choiceColor: 'unset', number: 4, scale: '1' },
-  { isAvailable: true, choiceColor: 'unset', number: 5, scale: '1' },
-  { isAvailable: true, choiceColor: 'unset', number: 6, scale: '1' },
-  { isAvailable: true, choiceColor: 'unset', number: 7, scale: '1' },
-  { isAvailable: true, choiceColor: 'unset', number: 8, scale: '1' },
-  { isAvailable: true, choiceColor: 'unset', number: 9, scale: '1' },
+  { isAvailable: true, choiceColor: UNSET, number: 1, scale: '1' },
+  { isAvailable: true, choiceColor: UNSET, number: 2, scale: '1' },
+  { isAvailable: true, choiceColor: UNSET, number: 3, scale: '1' },
+  { isAvailable: true, choiceColor: UNSET, number: 4, scale: '1' },
+  { isAvailable: true, choiceColor: UNSET, number: 5, scale: '1' },
+  { isAvailable: true, choiceColor: UNSET, number: 6, scale: '1' },
+  { isAvailable: true, choiceColor: UNSET, number: 7, scale: '1' },
+  { isAvailable: true, choiceColor: UNSET, number: 8, scale: '1' },
+  { isAvailable: true, choiceColor: UNSET, number: 9, scale: '1' },
 ];
 
 const colors = ["#0020FF", "#FF009F", "#FFDF00", "#00FF60", "#00DFFF"];
@@ -52,17 +54,17 @@ const GameView = () => {
 
         setPegs(pegs.map((statePeg) => {
           return statePeg.number === peg.number ? peg :
-            statePeg.number === pegMatch.number ? pegMatch : { ...statePeg, choiceColor: 'unset' }
+            statePeg.number === pegMatch.number ? pegMatch : { ...statePeg, choiceColor: UNSET }
         }));
       } else {
-        setPegs(pegs.map((statePeg) => statePeg.number === peg.number ? peg : { ...statePeg, choiceColor: 'unset' }));
+        setPegs(pegs.map((statePeg) => statePeg.number === peg.number ? peg : { ...statePeg, choiceColor: UNSET }));
       }
       setRoll(undefined);
     }
   }
 
   const handleOnMouseEnter = (peg) => {
-    if (roll && peg.choiceColor !== 'none') {
+    if (roll && peg.choiceColor !== UNSET) {
       // We want the current peg to have margin
       peg.scale = `${scaleFactor}`;
 
@@ -92,15 +94,23 @@ const GameView = () => {
     }
   };
 
+  const generatePegChoice = useCallback((number, color) => {
+    return {
+      number: number,
+      isAvailable: true,
+      choiceColor: color,
+      scale: '1',
+    };
+  }, []);
+
   const handleRoll = () => {
-    const firstDie = rollDice(1, 6);
-    const secondDie = rollDice(1, 6);
-    const availablePairs = findPairs(firstDie + secondDie, pegs);
+    const total = firstDie + secondDie;
+    const availablePairs = findPairs(total, pegs);
 
     setRoll({
       first: firstDie,
       second: secondDie,
-      total: firstDie + secondDie,
+      total: total,
     });
 
     // Modify the pegs to indicate the available choices
@@ -108,28 +118,21 @@ const GameView = () => {
     var colorIndices = generateRandomIndices(colors.length-1);
     var i = 0;
     var j = 8;
-    while (i <= j) {
+    while (i < j) {
+      const upperMatch = availablePairs[i];
       // If i is the key of an available pair
-      if (availablePairs[i]) {
+      if (upperMatch) {
         // Generate a color
         const generatedColor = colors[colorIndices.pop()];
 
         // indicate a pair match IFF i != 0
         if (i !== 0) {
-          newPegs.push({
-            number: i,
-            isAvailable: true,
-            choiceColor: generatedColor,
-          });
+          newPegs.push(generatePegChoice(i, generatedColor));
         }
-        newPegs.push({
-          number: availablePairs[i],
-          isAvailable: true,
-          choiceColor: generatedColor,
-        });
+        newPegs.push(generatePegChoice(upperMatch, generatedColor));
 
         // Index j to its partner
-        j = availablePairs[i] - 1;
+        j = upperMatch - 1;
 
         // Account for the only case in which there are no matching pairs, and
         //  only a single available peg
@@ -141,8 +144,11 @@ const GameView = () => {
           newPegs.push(pegs[i-1]);
         }
       }
-      i = i + 1;
+      i = i+1;
     }
+
+    // If i and j are equal, put the "double" roll number (for example, 3+3 = 6) onto the new pegs
+    newPegs.push(pegs[i-1]);
 
     // If i is 5, then that means that we are missing the last index of the
     //  original pegs array: index 8
