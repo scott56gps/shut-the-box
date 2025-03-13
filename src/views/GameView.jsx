@@ -104,6 +104,8 @@ const GameView = () => {
   }, []);
 
   const handleRoll = () => {
+    const firstDie = rollDice(1, 6);
+    const secondDie = rollDice(1, 6);
     const total = firstDie + secondDie;
     const availablePairs = findPairs(total, pegs);
 
@@ -133,12 +135,6 @@ const GameView = () => {
 
         // Index j to its partner
         j = upperMatch - 1;
-
-        // Account for the only case in which there are no matching pairs, and
-        //  only a single available peg
-        if (i === 0 && j === 1) {
-          newPegs.push(pegs[i]);
-        }
       } else {
         if (i !== 0) {
           newPegs.push(pegs[i-1]);
@@ -152,7 +148,7 @@ const GameView = () => {
       newPegs.push(pegs[i-1]);
     }
 
-    if (i !== 5 && j !== 4) {
+    if (i+j !== 9) {
       // There are more numbers to be put on
       newPegs = newPegs.concat(pegs.slice(i + j));
     }
