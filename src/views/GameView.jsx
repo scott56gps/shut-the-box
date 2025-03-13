@@ -115,7 +115,7 @@ const GameView = () => {
 
     // Modify the pegs to indicate the available choices
     var newPegs = [];
-    var colorIndices = generateRandomIndices(colors.length-1);
+    var colorIndices = generateRandomIndices(colors.length);
     var i = 0;
     var j = 8;
     while (i < j) {
@@ -148,11 +148,15 @@ const GameView = () => {
     }
 
     // If i and j are equal, put the "double" roll number (for example, 3+3 = 6) onto the new pegs
-    newPegs.push(pegs[i-1]);
+    if (i === j) {
+      newPegs.push(pegs[i-1]);
+    }
 
-    // If i is 5, then that means that we are missing the last index of the
-    //  original pegs array: index 8
-    newPegs = newPegs.concat(pegs.slice(i === 5 && j === 4 ? 8 : i + j));
+    if (i !== 5 && j !== 4) {
+      // There are more numbers to be put on
+      newPegs = newPegs.concat(pegs.slice(i + j));
+    }
+
     setPegs(newPegs.sort((peg1, peg2) => peg1.number > peg2.number));
   };
 
