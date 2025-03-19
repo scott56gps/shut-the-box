@@ -24,6 +24,7 @@
 .peg {
     font-weight: bold;
     padding: 0 12px;
+    cursor: default;
 }
 
 .option {
