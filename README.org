@@ -1,1 +1,16 @@
 * Shut The Box
+Shut The Box is a game in which a player rolls 2 dice and selects a combination
+of numbers that equal the dice sum.  Play continues until a combination cannot
+be formed for the current roll.  A score is made from the unselected numbers.
+2 players compete for the lowest score.  If you select all the numbers, you have
+*Shut The Box!*
+
+** How To Run
+This *react application* can be run by executing
+
+#+begin_src shell
+  npm install
+  npm start
+#+end_src
+
+in the top directory of this repo.
