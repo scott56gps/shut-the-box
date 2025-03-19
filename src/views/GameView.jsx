@@ -4,22 +4,21 @@ import findPairs from '../utils/findPairs';
 import './GameView.css';
 
 const UNSET = 'unset';
+const INITIAL_SCALE = '1';
+const COLORS = ["#0020FF", "#FF009F", "#FFDF00", "#00FF60", "#00DFFF"];
+const MAGNIFIED_SCALE = 1.3;
 
 const initialPegs = [
-  { isAvailable: true, choiceColor: UNSET, number: 1, scale: '1' },
-  { isAvailable: true, choiceColor: UNSET, number: 2, scale: '1' },
-  { isAvailable: true, choiceColor: UNSET, number: 3, scale: '1' },
-  { isAvailable: true, choiceColor: UNSET, number: 4, scale: '1' },
-  { isAvailable: true, choiceColor: UNSET, number: 5, scale: '1' },
-  { isAvailable: true, choiceColor: UNSET, number: 6, scale: '1' },
-  { isAvailable: true, choiceColor: UNSET, number: 7, scale: '1' },
-  { isAvailable: true, choiceColor: UNSET, number: 8, scale: '1' },
-  { isAvailable: true, choiceColor: UNSET, number: 9, scale: '1' },
+  { isAvailable: true, choiceColor: UNSET, number: 1, scale: INITIAL_SCALE },
+  { isAvailable: true, choiceColor: UNSET, number: 2, scale: INITIAL_SCALE },
+  { isAvailable: true, choiceColor: UNSET, number: 3, scale: INITIAL_SCALE },
+  { isAvailable: true, choiceColor: UNSET, number: 4, scale: INITIAL_SCALE },
+  { isAvailable: true, choiceColor: UNSET, number: 5, scale: INITIAL_SCALE },
+  { isAvailable: true, choiceColor: UNSET, number: 6, scale: INITIAL_SCALE },
+  { isAvailable: true, choiceColor: UNSET, number: 7, scale: INITIAL_SCALE },
+  { isAvailable: true, choiceColor: UNSET, number: 8, scale: INITIAL_SCALE },
+  { isAvailable: true, choiceColor: UNSET, number: 9, scale: INITIAL_SCALE },
 ];
-
-const colors = ["#0020FF", "#FF009F", "#FFDF00", "#00FF60", "#00DFFF"];
-
-const scaleFactor = 1.3;
 
 const GameView = () => {
   const [roll, setRoll] = useState(undefined);
@@ -66,7 +65,7 @@ const GameView = () => {
   const handleOnMouseEnter = (peg) => {
     if (roll && peg.choiceColor !== UNSET) {
       // We want the current peg to have margin
-      peg.scale = `${scaleFactor}`;
+      peg.scale = `${MAGNIFIED_SCALE}`;
 
       // AND its match
       if (roll.total !== peg.number) {
@@ -75,7 +74,7 @@ const GameView = () => {
         const pegMatch = pegs[pegDifference];
 
         // If the numbers are 1 away from each other, make the space half as wide
-        pegMatch.scale = `${scaleFactor}`;
+        pegMatch.scale = `${MAGNIFIED_SCALE}`;
 
         setPegs(pegs.map((statePeg) => statePeg.number === peg.number ? peg :
                          statePeg.number === pegMatch.number ? pegMatch : statePeg));
@@ -117,7 +116,7 @@ const GameView = () => {
 
     // Modify the pegs to indicate the available choices
     var newPegs = [];
-    var colorIndices = generateRandomIndices(colors.length);
+    var colorIndices = generateRandomIndices(COLORS.length);
     var i = 0;
     var j = 8;
     while (i < j) {
@@ -125,7 +124,7 @@ const GameView = () => {
       // If i is the key of an available pair
       if (upperMatch) {
         // Generate a color
-        const generatedColor = colors[colorIndices.pop()];
+        const generatedColor = COLORS[colorIndices.pop()];
 
         // indicate a pair match IFF i != 0
         if (i !== 0) {
