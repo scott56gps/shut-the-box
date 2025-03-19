@@ -15,4 +15,4 @@ This *react application* can be run by executing
 
 in the top directory of this repo.
 
-[[file:assets/game-screenshot.png][Gameplay]]
+[[./assets/game-screenshot.png]]
