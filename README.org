@@ -15,4 +15,8 @@ This *react application* can be run by executing
 
 in the top directory of this repo.
 
+** Game Screen
 [[./assets/game-screenshot.png]]
+
+After a peg or pair of pegs are selected
+[[./assets/pegs-selected.png]]
