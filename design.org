@@ -1,0 +1,209 @@
+* Shut The Box
+** STB-3 Unavailable pegs are not persisted when Roll button is pressed
+*** What I observe
+Sometimes, after a peg is chosen, when the Roll button is pressed again, some or
+all of the chosen pegs are removed from the chosen pegs location.
+
+*** What I expect
+After the roll button is pressed, if there are already pegs chosen, the already
+chosen pegs stay in the chosen pegs location and I am able to make another
+selection.
+
+*** Work
+Let's make a state diagram.
+
+| State | Available Pegs      | Chosen Pegs   | Roll | Available Choices             |
+|-------+---------------------+---------------+------+-------------------------------|
+| A     | {1,2,3,4,5,6,7,8,9} | {}            | -    | -                             |
+| B     | {1,2,3,4,5,6,7,8,9} | {}            | 7    | {{3,4},{2,5},{1,6},{7}}       |
+| C     | {1,2,5,6,7,8,9}     | {{3,4}}       | -    | -                             |
+| D     | {1,2,5,6,7,8,9}     | {{3,4}}       | 9    | {{4,5},{3,6},{2,7},{1,8},{9}} |
+| E     | {1,5,6,8,9}         | {{3,4},{2,7}} | -    | -                             |
+| F     | {1,5,6,8,9}         | {{3,4},{2,7}} | 3    | {{1,2},{3}}                   |
+STOP
+
+Observations:
+Available Choices MUST be a subset of Available Pegs
+
+Algorithm:
+1. Create Available Choices
+2. Remove from Available Choices any members containing Chosen Pegs
+3. Return the filtered Available Choices
+
+Key take away from this observation:
+Do not try to do everything all at once.  Take things in stages.  Do things one
+at a time.  Each stage is worthy of its own hire, if it is based on true
+principles.
+
+Don't try to make the most optimal algorithm at first.  Fix one problem at a
+time.  Settle myself on a simple solution first.  Then, work from there, *if*
+*necessary.*
+
+Don't try to solve so many problems on your own.  Rely on well-established
+practices.  Create simple solutions to simple problems FIRST.  Then, seek to
+simplify the aggregated result of the simple procedures.
+
+** Algorithm: generateAvailableChoices
+*** Version 1
+Roll : {x,y}
+Total : z : x+y
+
+Output : A set of sets {n,m} containing possible peg combinations based on the
+Roll
+
+1. N <- x (the lesser component)
+   M <- y (the greater component)
+   S <- {}
+2. IF N > 0 AND M <= 9:
+   1. INSERT S {N,M}
+   2. DECREMENT N
+   3. INCREMENT M
+3. IF z < 10:
+   1. INSERT S {z}
+4. RETURN S
+
+**** Desk Check
+Both dice are at maximum
+x: 6
+y: 6
+z: 12
+| N | M | S            |
+|---+---+--------------|
+| 6 | 6 | {}           |
+| 6 | 6 | {{6,6}}      |
+| 5 | 7 | {{6,6},{12}} |
+RETURN S
+
+Both dice are at minimum
+x: 1
+y: 1
+z: 2
+| N | M | S           |
+|---+---+-------------|
+| 1 | 1 | {}          |
+| 1 | 1 | {{1,1}}     |
+| 0 | 2 | {{1,1},{2}} |
+RETURN S
+
+One Dice is at minimum
+x: 1
+y: 2
+z: 3
+| N | M | S           |
+|---+---+-------------|
+| 1 | 2 | {}          |
+| 1 | 2 | {{1,2}}     |
+| 0 | 3 | {{1,2},{3}} |
+RETURN S
+
+One dice is at maximum
+x: 5
+y: 6
+z: 11
+| N | M | S       |
+|---+---+---------|
+| 5 | 6 | {}      |
+| 5 | 6 | {{5,6}} |
+| 4 | 7 | {{5,6}} |
+RETURN S
+
+One dice is at minimum, other is more than one away
+x: 1
+y: 5
+z: 6
+| N | M | S           |
+|---+---+-------------|
+| 1 | 5 | {}          |
+| 1 | 5 | {{1,5}}     |
+| 0 | 6 | {{1,5},{6}} |
+RETURN S
+
+S does not have all possible combinations of pairs of numbers that sum to z.
+
+**** Duplicate numbers are not allowed to be a pair
+The rules of a set must be followed.  Only unique elements are allowed.
+
+Example: As in the first desk check, doubles are rolled.
+In this situation, the 6 must not be added to S.
+
+**** Not all possible combinations of pairs of numbers are present
+Possible solution:
+If N gets to 0 AND M is not equal to
+
+*** Version 2
+Roll : z
+
+Output : A set of sets {n,m} containing possible peg combinations based on the
+Roll
+
+1. Midway, Remainder <- z/2,z%2  // Find midway point, M
+2. IF Remainder == 0  // z is even
+   1. countChoices(Midway-1, Midway+1, {}) // We don't want to include the
+                                           // "doubles" value, AKA the perfect
+                                           // midway point
+3. ELSE
+   1. countChoices(Midway, Midway+1, {})
+
+
+/ N : The lower component of the midway point
+/ M : The higher component of the midway point
+/ S : The return set of combinations of pairs that make up z
+countChoices(N, M, S):
+1. IF N == 0:
+   1. INSERT S {M}
+   2. RETURN S.
+2. ELSE IF M == 9:
+   1. RETURN S.
+3. ELSE
+   1. INSERT S {N,M}
+   2. RETURN countChoices(N-1,M+1,S).
+
+**** Desk Check
+Absolute maximum
+z: 12
+| N | M | S             |
+|---+---+---------------|
+| 5 | 7 | {5,7}         |
+| 4 | 8 | {5,7,4,8}     |
+| 3 | 9 | {5,7,4,8,3,9} |
+
+Absolute minimum
+z: 2
+| N | M | S   |
+|---+---+-----|
+| 0 | 2 | {2} |
+
+One Dice is at minimum
+z: 3
+| N | M | S       |
+|---+---+---------|
+| 1 | 2 | {1,2}   |
+| 0 | 3 | {1,2,3} |
+
+One dice is at maximum
+z: 11
+| N | M | S               |
+|---+---+-----------------|
+| 5 | 6 | 5,6             |
+| 4 | 7 | 5,6,4,7         |
+| 3 | 8 | 5,6,4,7,3,8     |
+| 2 | 9 | 5,6,4,7,3,8,2,9 |
+
+9 is rolled
+z: 9
+| N | M | S                 |
+|---+---+-------------------|
+| 4 | 5 | 4,5               |
+| 3 | 6 | 4,5,3,6           |
+| 2 | 7 | 4,5,3,6,2,7       |
+| 1 | 8 | 4,5,3,6,2,7,1,8   |
+| 0 | 9 | 4,5,3,6,2,7,1,8,9 |
+
+10 is rolled
+z: 10
+| N | M | S               |
+|---+---+-----------------|
+| 4 | 6 | 4,6             |
+| 3 | 7 | 4,6,3,7         |
+| 2 | 8 | 4,6,3,7,2,8     |
+| 1 | 9 | 4,6,3,7,2,8,1,9 |
