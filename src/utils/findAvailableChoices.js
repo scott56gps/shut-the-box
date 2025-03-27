@@ -8,10 +8,10 @@
    @param {object} choiceSet A set of numbers that represent possible choices
  */
 const countChoices = (N, M, choiceSet) => {
-  if (N === 0) {
-    choiceSet.add(M);
+  if (M === 10) {
     return choiceSet;
-  } else if (M === 10) {
+  } else if (N === 0) {
+    choiceSet.add(M);
     return choiceSet;
   } else {
     choiceSet.add(N);
