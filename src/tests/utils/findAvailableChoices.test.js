@@ -5,11 +5,11 @@ test('N: 0, M: 2, to yield S: {2}', () => {
 });
 
 test('N: 5, M: 7, to yield S: {5,7,4,8,3,9}', () => {
-  expect(countChoices(5, 7, new Set())).toEqual(new Set([5,7,4,8,3,9]));
+  expect(countChoices(5, 7, new Set())).toEqual(new Set([5, 7, 4, 8, 3, 9]));
 });
 
 test('N: 1, M: 2, to yield S: {1,2,3}', () => {
-  expect(countChoices(1, 2, new Set())).toEqual(new Set([1,2,3]));
+  expect(countChoices(1, 2, new Set())).toEqual(new Set([1, 2, 3]));
 });
 
 test('N: 4, M: 6, to yield S: {4,6,3,7,2,8,1,9}', () => {
