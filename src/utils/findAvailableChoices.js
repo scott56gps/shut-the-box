@@ -11,7 +11,7 @@ const countChoices = (N, M, choiceSet) => {
   if (N === 0) {
     choiceSet.add(M);
     return choiceSet;
-  } else if (M === 9) {
+  } else if (M === 10) {
     return choiceSet;
   } else {
     choiceSet.add(N);
@@ -19,3 +19,5 @@ const countChoices = (N, M, choiceSet) => {
     return countChoices(N-1, M+1, choiceSet);
   }
 }
+
+module.exports = countChoices;
