@@ -66,33 +66,44 @@ const GameView = () => {
   }
 
   const handleOnMouseEnter = (peg) => {
-    if (roll && peg.choiceColor !== UNSET) {
-      // We want the current peg to have margin
-      peg.scale = `${MAGNIFIED_SCALE}`;
+    // We want the current peg to be scaled
+    peg.scale = `${MAGNIFIED_SCALE}`;
 
-      // AND its match
-      if (roll.total !== peg.number) {
-        // There is a match to find
-        const pegDifference = roll.total - peg.number - 1;
-        const pegMatch = pegs[pegDifference];
-
-        // If the numbers are 1 away from each other, make the space half as wide
-        pegMatch.scale = `${MAGNIFIED_SCALE}`;
-
-        setPegs(pegs.map((statePeg) => statePeg.number === peg.number ? peg :
-                         statePeg.number === pegMatch.number ? pegMatch : statePeg));
-      } else {
-        setPegs(pegs.map((statePeg) => statePeg.number === peg.number ? peg : statePeg));
-      }
+    // AND its match
+    if (peg.number !== roll.total) {
+      const matchKey = roll.total - peg.number;
+      const pegMatch = availablePegs[matchKey];
+      pegMatch.scale = `${MAGNIFIED_SCALE}`;
+      setAvailablePegs({
+        ...availablePegs,
+        [peg.number]: peg,
+        [matchKey]: pegMatch,
+      });
+    } else {
+      setAvailablePegs({
+        ...availablePegs,
+        [peg.number]: peg,
+      });
     }
   };
 
-  const handleOnMouseLeave = () => {
-    if (pegs) {
-      setPegs(pegs.map((peg) => {
-        peg.scale = '1';
-        return peg;
-      }))
+  const handleOnMouseLeave = (peg) => {
+    peg.scale = INITIAL_SCALE;
+
+    if (peg.number !== roll.total) {
+      const matchKey = roll.total - peg.number;
+      const pegMatch = availablePegs[matchKey];
+      pegMatch.scale = INITIAL_SCALE;
+      setAvailablePegs({
+        ...availablePegs,
+        [peg.number]: peg,
+        [matchKey]: pegMatch,
+      });
+    } else {
+      setAvailablePegs({
+        ...availablePegs,
+        [peg.number]: peg,
+      });
     }
   };
 
@@ -125,47 +136,6 @@ const GameView = () => {
       total: total,
     });
     setAvailablePegs(newAvailablePegs);
-
-
-    // Modify the pegs to indicate the available choices
-    // var newPegs = [];
-    // var colorIndices = generateRandomIndices(COLORS.length);
-    // var i = 0;
-    // var j = 8;
-    // while (i < j) {
-    //   const upperMatch = availablePairs[i];
-    //   // If i is the key of an available pair
-    //   if (upperMatch) {
-    //     // Generate a color
-    //     const generatedColor = COLORS[colorIndices.pop()];
-
-    //     // indicate a pair match IFF i != 0
-    //     if (i !== 0) {
-    //       newPegs.push(generatePegChoice(i, generatedColor));
-    //     }
-    //     newPegs.push(generatePegChoice(upperMatch, generatedColor));
-
-    //     // Index j to its partner
-    //     j = upperMatch - 1;
-    //   } else {
-    //     if (i !== 0) {
-    //       newPegs.push(pegs[i-1]);
-    //     }
-    //   }
-    //   i = i+1;
-    // }
-
-    // // If i and j are equal, put the "double" roll number (for example, 3+3 = 6) onto the new pegs
-    // if (i === j) {
-    //   newPegs.push(pegs[i-1]);
-    // }
-
-    // if (i+j !== 9) {
-    //   // There are more numbers to be put on
-    //   newPegs = newPegs.concat(pegs.slice(i + j));
-    // }
-
-    // setPegs(newPegs.sort((peg1, peg2) => peg1.number > peg2.number));
   };
 
   const handleReset = () => {
@@ -188,7 +158,7 @@ const GameView = () => {
                   key={availablePeg.number}
                   onClick={() => handlePegSelect(availablePeg)}
                   onMouseEnter={() => handleOnMouseEnter(availablePeg)}
-                  onMouseLeave={handleOnMouseLeave}
+                  onMouseLeave={() => handleOnMouseLeave(availablePeg)}
                 >
                   {availablePeg.number}
                 </span>
