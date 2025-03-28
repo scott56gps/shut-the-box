@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
 
-import findPairs from '../utils/findPairs';
 import './GameView.css';
+const findAvailablePairs = require('../utils/findAvailablePairs');
 
 const UNSET = 'unset';
 const INITIAL_SCALE = '1';
@@ -23,6 +23,9 @@ const initialPegs = [
 const GameView = () => {
   const [roll, setRoll] = useState(undefined);
   const [pegs, setPegs] = useState(initialPegs);
+  const [availablePegs, setAvailablePegs] = useState(undefined);
+  const [chosenNumbers, setChosenNumbers] = useState(undefined);
+  const [availableNumbers, setAvailableNumbers] = useState([1, 2, 3, 4, 5, 6, 7, 8, 9]);
 
   const rollDice = (min, max) => min + Math.floor(Math.random() * (max - min + 1));
 
@@ -96,7 +99,6 @@ const GameView = () => {
   const generatePegChoice = useCallback((number, color) => {
     return {
       number: number,
-      isAvailable: true,
       choiceColor: color,
       scale: '1',
     };
@@ -106,53 +108,64 @@ const GameView = () => {
     const firstDie = rollDice(1, 6);
     const secondDie = rollDice(1, 6);
     const total = firstDie + secondDie;
-    const availablePairs = findPairs(total, pegs);
+    const availablePairs = findAvailablePairs(total, availableNumbers);
+
+    var colorIndices = generateRandomIndices(COLORS.length);
+
+    const newAvailablePegs = [...availablePairs].reduce((accumulator, pair) => {
+      const color = COLORS[colorIndices.pop()];
+      accumulator[pair[0]] = generatePegChoice(pair[0], color);
+      if (pair[1]) accumulator[pair[1]] = generatePegChoice(pair[1], color);
+      return accumulator;
+    }, {});
 
     setRoll({
       first: firstDie,
       second: secondDie,
       total: total,
     });
+    setAvailablePegs(newAvailablePegs);
+
 
     // Modify the pegs to indicate the available choices
-    var newPegs = [];
-    var colorIndices = generateRandomIndices(COLORS.length);
-    var i = 0;
-    var j = 8;
-    while (i < j) {
-      const upperMatch = availablePairs[i];
-      // If i is the key of an available pair
-      if (upperMatch) {
-        // Generate a color
-        const generatedColor = COLORS[colorIndices.pop()];
+    // var newPegs = [];
+    // var colorIndices = generateRandomIndices(COLORS.length);
+    // var i = 0;
+    // var j = 8;
+    // while (i < j) {
+    //   const upperMatch = availablePairs[i];
+    //   // If i is the key of an available pair
+    //   if (upperMatch) {
+    //     // Generate a color
+    //     const generatedColor = COLORS[colorIndices.pop()];
 
-        // indicate a pair match IFF i != 0
-        if (i !== 0) {
-          newPegs.push(generatePegChoice(i, generatedColor));
-        }
-        newPegs.push(generatePegChoice(upperMatch, generatedColor));
+    //     // indicate a pair match IFF i != 0
+    //     if (i !== 0) {
+    //       newPegs.push(generatePegChoice(i, generatedColor));
+    //     }
+    //     newPegs.push(generatePegChoice(upperMatch, generatedColor));
 
-        // Index j to its partner
-        j = upperMatch - 1;
-      } else {
-        if (i !== 0) {
-          newPegs.push(pegs[i-1]);
-        }
-      }
-      i = i+1;
-    }
+    //     // Index j to its partner
+    //     j = upperMatch - 1;
+    //   } else {
+    //     if (i !== 0) {
+    //       newPegs.push(pegs[i-1]);
+    //     }
+    //   }
+    //   i = i+1;
+    // }
 
-    // If i and j are equal, put the "double" roll number (for example, 3+3 = 6) onto the new pegs
-    if (i === j) {
-      newPegs.push(pegs[i-1]);
-    }
+    // // If i and j are equal, put the "double" roll number (for example, 3+3 = 6) onto the new pegs
+    // if (i === j) {
+    //   newPegs.push(pegs[i-1]);
+    // }
 
-    if (i+j !== 9) {
-      // There are more numbers to be put on
-      newPegs = newPegs.concat(pegs.slice(i + j));
-    }
+    // if (i+j !== 9) {
+    //   // There are more numbers to be put on
+    //   newPegs = newPegs.concat(pegs.slice(i + j));
+    // }
 
-    setPegs(newPegs.sort((peg1, peg2) => peg1.number > peg2.number));
+    // setPegs(newPegs.sort((peg1, peg2) => peg1.number > peg2.number));
   };
 
   const handleReset = () => {
@@ -164,30 +177,58 @@ const GameView = () => {
     <div className="App">
       <div className="game-board">
         <div className="pegs-container">
-          {pegs.map((peg) => (
-            <span
-              className="peg"
-              style={{ backgroundColor: peg.choiceColor, opacity: peg.isAvailable ? '100%' : '0', transform: `scale(${peg.scale})` }}
-              key={peg.number}
-              onClick={() => handlePegSelect(peg)}
-              onMouseEnter={() => handleOnMouseEnter(peg)}
-              onMouseLeave={handleOnMouseLeave}
-            >
-              {peg.number}
-            </span>
-          ))}
+          {[...Array(9)].map((_, i) => {
+            const availablePeg = availablePegs ? availablePegs[i+1] : undefined;
+
+            if (availablePeg) {
+              return (
+                <span
+                  className="peg"
+                  style={{ backgroundColor: availablePeg.choiceColor, transform: `scale(${availablePeg.scale})` }}
+                  key={availablePeg.number}
+                  onClick={() => handlePegSelect(availablePeg)}
+                  onMouseEnter={() => handleOnMouseEnter(availablePeg)}
+                  onMouseLeave={handleOnMouseLeave}
+                >
+                  {availablePeg.number}
+                </span>
+              );
+            } else {
+              return (
+                <span
+                  className="peg"
+                  style={{ backgroundColor: UNSET, opacity: chosenNumbers && chosenNumbers.has(i+1) ? '0' : '100%' }}
+                  key={i+1}
+                >
+                  {i+1}
+                </span>
+              )
+            }
+          })}
+          {/* pegs.map((peg) => ( */
+          /*   <span */
+          /*     className="peg" */
+          /*     style={{ backgroundColor: peg.choiceColor, opacity: peg.isAvailable ? '100%' : '0', transform: `scale(${peg.scale})` }} */
+          /*     key={peg.number} */
+          /*     onClick={() => handlePegSelect(peg)} */
+          /*     onMouseEnter={() => handleOnMouseEnter(peg)} */
+          /*     onMouseLeave={handleOnMouseLeave} */
+          /*   > */
+          /*     {peg.number} */
+          /*   </span> */
+          /* )) */}
         </div>
-        <div className="selected-pegs-container">
-          {pegs.map((peg) => (
-            <span
-              className="peg"
-              key={peg.number}
-              style={{ opacity: peg.isAvailable ? '0' : '100%' }}
-            >
-              {peg.number}
-            </span>
-          ))}
-        </div>
+        {/* <div className="selected-pegs-container"> */}
+        {/*   {pegs.map((peg) => ( */}
+        {/*     <span */}
+        {/*       className="peg" */}
+        {/*       key={peg.number} */}
+        {/*       style={{ opacity: peg.isAvailable ? '0' : '100%' }} */}
+        {/*     > */}
+        {/*       {peg.number} */}
+        {/*     </span> */}
+        {/*   ))} */}
+        {/* </div> */}
         <div className="roll-container">
           {roll ? (
             <>
