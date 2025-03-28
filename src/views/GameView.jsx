@@ -175,18 +175,6 @@ const GameView = () => {
               )
             }
           })}
-          {/* pegs.map((peg) => ( */
-          /*   <span */
-          /*     className="peg" */
-          /*     style={{ backgroundColor: peg.choiceColor, opacity: peg.isAvailable ? '100%' : '0', transform: `scale(${peg.scale})` }} */
-          /*     key={peg.number} */
-          /*     onClick={() => handlePegSelect(peg)} */
-          /*     onMouseEnter={() => handleOnMouseEnter(peg)} */
-          /*     onMouseLeave={handleOnMouseLeave} */
-          /*   > */
-          /*     {peg.number} */
-          /*   </span> */
-          /* )) */}
         </div>
         {/* <div className="selected-pegs-container"> */}
         {/*   {pegs.map((peg) => ( */}
