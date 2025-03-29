@@ -1,5 +1,6 @@
 import React, { useCallback, useState } from 'react';
 
+import generateRandomIndices from '../utils/generateRandomIndices';
 import './GameView.css';
 const findAvailablePairs = require('../utils/findAvailablePairs');
 
@@ -14,20 +15,6 @@ const GameView = () => {
   const [availableNumbers, setAvailableNumbers] = useState(new Set([1, 2, 3, 4, 5, 6, 7, 8, 9]));
 
   const rollDice = (min, max) => min + Math.floor(Math.random() * (max - min + 1));
-
-  /**
-     Generates a random list of indices from 0 to n.
-   */
-  const generateRandomIndices = (n) => {
-    var arr = [];
-    while (arr.length < n) {
-      var r = Math.floor(Math.random() * n)
-      if (arr.indexOf(r) === -1) {
-        arr.push(r)
-      }
-    }
-    return arr;
-  };
 
   const handlePegSelect = (peg) => {
     // We need to remove the number from the available numbers
