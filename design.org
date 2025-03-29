@@ -207,3 +207,15 @@ z: 10
 | 3 | 7 | 4,6,3,7         |
 | 2 | 8 | 4,6,3,7,2,8     |
 | 1 | 9 | 4,6,3,7,2,8,1,9 |
+
+** How Will I Display The Available Numbers?
+The model now looks like this: [1,2,3,6,9]
+
+The model's length can be modified.
+
+THE UI requires numbers 1-9 to always be displayed on the screen, yet in
+different states.
+
+*** Idea 1: Map through Numbers 1..9
+Instead of mapping through the available numbers, map through the range of
+numbers 1..9.
