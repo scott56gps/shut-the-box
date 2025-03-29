@@ -3,8 +3,9 @@
    array.  If the sum is less than 9, the sum itself forms an available single
    "pair."
 
-   @param {number} sum A sum that can be rolled with 2 6-sided dice
-   @param {set} available An array of available numbers to choose from.
+   @param {Number} sum A sum that can be rolled with 2 6-sided dice
+   @param {Set} available An array or set of available numbers to choose from.
+   @returns A Set object containing pairs of numbers that sum to the given sum.
  */
 const findAvailablePairs = (sum, available) => {
   const midpoint = Math.floor(sum / 2);
@@ -20,11 +21,11 @@ const findAvailablePairs = (sum, available) => {
    N and M.  N and M must not be the same.  If N and M are the same, an empty
    set is returned.
 
-   @param {number} N The lower component of a sum
-   @param {number} M The upper component of a sum
-   @param {set} choiceSet A set of numbers that represent possible choices
-   @param {set} available An array of available numbers to choose from.
-   @returns {array} A Set object containing possible combinations of numbers.
+   @param {Number} N The lower component of a sum
+   @param {Number} M The upper component of a sum
+   @param {Set} choiceSet A set of numbers that represent possible choices
+   @param {Set} available An array of available numbers to choose from.
+   @returns {Set} A Set object containing possible combinations of numbers.
  */
 const countChoices = (N, M, choiceSet, available) => {
   if (M === 10) {
