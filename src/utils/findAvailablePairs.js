@@ -4,7 +4,7 @@
    "pair."
 
    @param {number} sum A sum that can be rolled with 2 6-sided dice
-   @param {Array} available An array of available numbers to choose from.
+   @param {set} available An array of available numbers to choose from.
  */
 const findAvailablePairs = (sum, available) => {
   const midpoint = Math.floor(sum / 2);

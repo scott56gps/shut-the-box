@@ -8,24 +8,10 @@ const INITIAL_SCALE = '1';
 const COLORS = ["#0020FF", "#FF009F", "#FFDF00", "#00FF60", "#00DFFF"];
 const MAGNIFIED_SCALE = 1.3;
 
-const initialPegs = [
-  { isAvailable: true, choiceColor: UNSET, number: 1, scale: INITIAL_SCALE },
-  { isAvailable: true, choiceColor: UNSET, number: 2, scale: INITIAL_SCALE },
-  { isAvailable: true, choiceColor: UNSET, number: 3, scale: INITIAL_SCALE },
-  { isAvailable: true, choiceColor: UNSET, number: 4, scale: INITIAL_SCALE },
-  { isAvailable: true, choiceColor: UNSET, number: 5, scale: INITIAL_SCALE },
-  { isAvailable: true, choiceColor: UNSET, number: 6, scale: INITIAL_SCALE },
-  { isAvailable: true, choiceColor: UNSET, number: 7, scale: INITIAL_SCALE },
-  { isAvailable: true, choiceColor: UNSET, number: 8, scale: INITIAL_SCALE },
-  { isAvailable: true, choiceColor: UNSET, number: 9, scale: INITIAL_SCALE },
-];
-
 const GameView = () => {
   const [roll, setRoll] = useState(undefined);
-  const [pegs, setPegs] = useState(initialPegs);
   const [availablePegs, setAvailablePegs] = useState(undefined);
-  const [chosenNumbers, setChosenNumbers] = useState(undefined);
-  const [availableNumbers, setAvailableNumbers] = useState([1, 2, 3, 4, 5, 6, 7, 8, 9]);
+  const [availableNumbers, setAvailableNumbers] = useState(new Set([1, 2, 3, 4, 5, 6, 7, 8, 9]));
 
   const rollDice = (min, max) => min + Math.floor(Math.random() * (max - min + 1));
 
@@ -44,25 +30,23 @@ const GameView = () => {
   };
 
   const handlePegSelect = (peg) => {
-    if (roll && peg.choiceColor !== 'none') {
-      peg.isAvailable = false;
+    // We need to remove the number from the available numbers
+    // And then add this to the chosenNumbers
 
-      if (roll.total !== peg.number) {
-        // There is a match to find
-        const pegDifference = roll.total - peg.number - 1;
-        const pegMatch = pegs[pegDifference];
+    if (peg.number !== roll.total) {
+      // There is a match to find
+      const matchKey = roll.total - peg.number;
+      const pegMatch = availablePegs[matchKey];
 
-        pegMatch.isAvailable = false;
-
-        setPegs(pegs.map((statePeg) => {
-          return statePeg.number === peg.number ? peg :
-            statePeg.number === pegMatch.number ? pegMatch : { ...statePeg, choiceColor: UNSET }
-        }));
-      } else {
-        setPegs(pegs.map((statePeg) => statePeg.number === peg.number ? peg : { ...statePeg, choiceColor: UNSET }));
-      }
-      setRoll(undefined);
+      console.log("pegMatch", pegMatch);
+      setAvailableNumbers(new Set([...availableNumbers].filter((number) =>
+        number !== peg.number && number !== pegMatch.number)));
+    } else {
+      setAvailableNumbers(new Set([...availableNumbers].filter((number) =>
+        number !== peg.number)));
     }
+    setAvailablePegs(undefined);
+    setRoll(undefined);
   }
 
   const handleOnMouseEnter = (peg) => {
@@ -74,6 +58,7 @@ const GameView = () => {
       const matchKey = roll.total - peg.number;
       const pegMatch = availablePegs[matchKey];
       pegMatch.scale = `${MAGNIFIED_SCALE}`;
+
       setAvailablePegs({
         ...availablePegs,
         [peg.number]: peg,
@@ -94,6 +79,7 @@ const GameView = () => {
       const matchKey = roll.total - peg.number;
       const pegMatch = availablePegs[matchKey];
       pegMatch.scale = INITIAL_SCALE;
+
       setAvailablePegs({
         ...availablePegs,
         [peg.number]: peg,
@@ -140,7 +126,7 @@ const GameView = () => {
 
   const handleReset = () => {
     setRoll(undefined);
-    setPegs(initialPegs);
+    setAvailablePegs(undefined);
   };
 
   return (
@@ -167,7 +153,7 @@ const GameView = () => {
               return (
                 <span
                   className="peg"
-                  style={{ backgroundColor: UNSET, opacity: chosenNumbers && chosenNumbers.has(i+1) ? '0' : '100%' }}
+                  style={{ backgroundColor: UNSET, opacity: !availableNumbers.has(i+1) ? '0' : '100%' }}
                   key={i+1}
                 >
                   {i+1}
@@ -176,17 +162,17 @@ const GameView = () => {
             }
           })}
         </div>
-        {/* <div className="selected-pegs-container"> */}
-        {/*   {pegs.map((peg) => ( */}
-        {/*     <span */}
-        {/*       className="peg" */}
-        {/*       key={peg.number} */}
-        {/*       style={{ opacity: peg.isAvailable ? '0' : '100%' }} */}
-        {/*     > */}
-        {/*       {peg.number} */}
-        {/*     </span> */}
-        {/*   ))} */}
-        {/* </div> */}
+        <div className="selected-pegs-container">
+          {availableNumbers.size < 9 && [...Array(9)].map((_, i) => (
+            <span
+              className="peg"
+              key={i}
+              style={{ backgroundColor: UNSET, opacity: availableNumbers.has(i+1) ? '0' : '100%' }}
+            >
+              {i+1}
+            </span>
+          ))}
+        </div>
         <div className="roll-container">
           {roll ? (
             <>
