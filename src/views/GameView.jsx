@@ -2,30 +2,28 @@ import React, { useCallback, useState } from 'react';
 
 import generateRandomIndices from '../utils/generateRandomIndices';
 import './GameView.css';
+
 const findAvailablePairs = require('../utils/findAvailablePairs');
 
 const UNSET = 'unset';
 const INITIAL_SCALE = '1';
 const COLORS = ["#0020FF", "#FF009F", "#FFDF00", "#00FF60", "#00DFFF"];
 const MAGNIFIED_SCALE = 1.3;
+const INITIAL_NUMBERS = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
 const GameView = () => {
   const [roll, setRoll] = useState(undefined);
   const [availablePegs, setAvailablePegs] = useState(undefined);
-  const [availableNumbers, setAvailableNumbers] = useState(new Set([1, 2, 3, 4, 5, 6, 7, 8, 9]));
+  const [availableNumbers, setAvailableNumbers] = useState(new Set(INITIAL_NUMBERS));
 
   const rollDice = (min, max) => min + Math.floor(Math.random() * (max - min + 1));
 
   const handlePegSelect = (peg) => {
-    // We need to remove the number from the available numbers
-    // And then add this to the chosenNumbers
-
     if (peg.number !== roll.total) {
       // There is a match to find
       const matchKey = roll.total - peg.number;
       const pegMatch = availablePegs[matchKey];
 
-      console.log("pegMatch", pegMatch);
       setAvailableNumbers(new Set([...availableNumbers].filter((number) =>
         number !== peg.number && number !== pegMatch.number)));
     } else {
@@ -114,7 +112,31 @@ const GameView = () => {
   const handleReset = () => {
     setRoll(undefined);
     setAvailablePegs(undefined);
+    setAvailableNumbers(new Set(INITIAL_NUMBERS));
   };
+
+  const displayAvailablePeg = (peg) => (
+    <span
+      className="peg"
+      style={{ backgroundColor: peg.choiceColor, transform: `scale(${peg.scale})` }}
+      key={peg.number}
+      onClick={() => handlePegSelect(peg)}
+      onMouseEnter={() => handleOnMouseEnter(peg)}
+      onMouseLeave={() => handleOnMouseLeave(peg)}
+    >
+      {peg.number}
+    </span>
+  );
+
+  const displayNonAvailablePeg = (number, opacityPredicate) => (
+    <span
+      className="peg"
+      style={{ backgroundColor: UNSET, opacity: opacityPredicate(number) ? '0' : '100%' }}
+      key={number}
+    >
+      {number}
+    </span>
+  );
 
   return (
     <div className="App">
@@ -124,41 +146,15 @@ const GameView = () => {
             const availablePeg = availablePegs ? availablePegs[i+1] : undefined;
 
             if (availablePeg) {
-              return (
-                <span
-                  className="peg"
-                  style={{ backgroundColor: availablePeg.choiceColor, transform: `scale(${availablePeg.scale})` }}
-                  key={availablePeg.number}
-                  onClick={() => handlePegSelect(availablePeg)}
-                  onMouseEnter={() => handleOnMouseEnter(availablePeg)}
-                  onMouseLeave={() => handleOnMouseLeave(availablePeg)}
-                >
-                  {availablePeg.number}
-                </span>
-              );
+              return displayAvailablePeg(availablePeg);
             } else {
-              return (
-                <span
-                  className="peg"
-                  style={{ backgroundColor: UNSET, opacity: !availableNumbers.has(i+1) ? '0' : '100%' }}
-                  key={i+1}
-                >
-                  {i+1}
-                </span>
-              )
+              return displayNonAvailablePeg(i+1, (number) => !availableNumbers.has(number))
             }
           })}
         </div>
         <div className="selected-pegs-container">
-          {availableNumbers.size < 9 && [...Array(9)].map((_, i) => (
-            <span
-              className="peg"
-              key={i}
-              style={{ backgroundColor: UNSET, opacity: availableNumbers.has(i+1) ? '0' : '100%' }}
-            >
-              {i+1}
-            </span>
-          ))}
+          {availableNumbers.size < 9 && [...Array(9)].map((_, i) =>
+            displayNonAvailablePeg(i+1, (number) => availableNumbers.has(number)))}
         </div>
         <div className="roll-container">
           {roll ? (
