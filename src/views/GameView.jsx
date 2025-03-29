@@ -25,7 +25,7 @@ const GameView = () => {
      - Resets state of availablePegs to initial state
      - Resets state of roll to initial state
 
-     @param {object} peg A peg object that is selected
+     @param {Object} peg A peg object that is selected
    */
   const handlePegSelect = (peg) => {
     if (peg.number !== roll.total) {
@@ -50,7 +50,7 @@ const GameView = () => {
      corresponding match, if any.  A match is the complement of the peg's number
      to the dice roll total.
 
-     @param {object} peg The peg that was hovered over.
+     @param {Object} peg The peg that was hovered over.
   */
   const handleOnMouseEnter = (peg) => {
     // We want the current peg to be scaled
