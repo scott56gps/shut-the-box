@@ -18,6 +18,15 @@ const GameView = () => {
 
   const rollDice = (min, max) => min + Math.floor(Math.random() * (max - min + 1));
 
+  /**
+     Handles effect for when a peg is selected.
+     SIDE EFFECTS:
+     - Removes the number for the given peg from availableNumbers
+     - Resets state of availablePegs to initial state
+     - Resets state of roll to initial state
+
+     @param {object} peg A peg object that is selected
+   */
   const handlePegSelect = (peg) => {
     if (peg.number !== roll.total) {
       // There is a match to find
@@ -34,6 +43,15 @@ const GameView = () => {
     setRoll(undefined);
   }
 
+  /**
+     Handles effect for when the mouse is hovered over a peg.
+     SIDE EFFECTS:
+     - Modifies available pegs to contain the modified hovered peg and its
+     corresponding match, if any.  A match is the complement of the peg's number
+     to the dice roll total.
+
+     @param {object} peg The peg that was hovered over.
+  */
   const handleOnMouseEnter = (peg) => {
     // We want the current peg to be scaled
     peg.scale = `${MAGNIFIED_SCALE}`;
@@ -57,6 +75,15 @@ const GameView = () => {
     }
   };
 
+  /**
+     Handles effect for when the mouse has left a peg.
+     SIDE EFFECTS:
+     - Modifies available pegs to contain the modified peg that was previously
+     hovered over and its corresponding match, if any.  A match is the
+     complement of the peg's number to the dice roll total.
+
+     @param {Object} peg The peg that was left.
+  */
   const handleOnMouseLeave = (peg) => {
     peg.scale = INITIAL_SCALE;
 
@@ -78,6 +105,13 @@ const GameView = () => {
     }
   };
 
+  /**
+     Creates a peg object for the given number and color.
+
+     @param {Number} number A number to associate this peg with
+     @param {String} color A string specifying a color for this peg.  The string
+     can be a HEX code or CSS name for a string.
+   */
   const generatePegChoice = useCallback((number, color) => {
     return {
       number: number,
@@ -86,6 +120,12 @@ const GameView = () => {
     };
   }, []);
 
+  /**
+     Handles effect for when the roll button is pressed.
+     SIDE EFFECTS:
+     - Specifies dice roll
+     - Specifies available pegs based on the dice roll performed
+   */
   const handleRoll = () => {
     const firstDie = rollDice(1, 6);
     const secondDie = rollDice(1, 6);
@@ -109,12 +149,23 @@ const GameView = () => {
     setAvailablePegs(newAvailablePegs);
   };
 
+  /**
+     Handles effect for when the reset button is pressed.
+     SIDE EFFECTS:
+     - Resets ALL state variables to initial values
+   */
   const handleReset = () => {
     setRoll(undefined);
     setAvailablePegs(undefined);
     setAvailableNumbers(new Set(INITIAL_NUMBERS));
   };
 
+  /**
+     Specifies the display for an available peg.
+
+     @param {Object} peg An available peg object
+     @returns A JSX element specifying the display of an available peg
+   */
   const displayAvailablePeg = (peg) => (
     <span
       className="peg"
@@ -128,7 +179,16 @@ const GameView = () => {
     </span>
   );
 
-  const displayNonAvailablePeg = (number, opacityPredicate) => (
+  /**
+     Specifies the display for an unavailable peg.
+
+     @param {Number} number A number to associate with this peg
+     @param {Function} opacityPredicate A function returning a boolean that specifies:
+     - True: Make this peg opaque
+     - False: Make this peg visible
+     @returns A JSX element specifying the display of an unavailable peg
+   */
+  const displayUnavailablePeg = (number, opacityPredicate) => (
     <span
       className="peg"
       style={{ backgroundColor: UNSET, opacity: opacityPredicate(number) ? '0' : '100%' }}
@@ -143,18 +203,14 @@ const GameView = () => {
       <div className="game-board">
         <div className="pegs-container">
           {[...Array(9)].map((_, i) => {
-            const availablePeg = availablePegs ? availablePegs[i+1] : undefined;
-
-            if (availablePeg) {
-              return displayAvailablePeg(availablePeg);
-            } else {
-              return displayNonAvailablePeg(i+1, (number) => !availableNumbers.has(number))
-            }
+            return availablePegs && availablePegs[i + 1] ?
+              displayAvailablePeg(availablePegs[i + 1]) :
+              displayUnavailablePeg(i + 1, (number) => !availableNumbers.has(number));
           })}
         </div>
         <div className="selected-pegs-container">
           {availableNumbers.size < 9 && [...Array(9)].map((_, i) =>
-            displayNonAvailablePeg(i+1, (number) => availableNumbers.has(number)))}
+            displayUnavailablePeg(i + 1, (number) => availableNumbers.has(number)))}
         </div>
         <div className="roll-container">
           {roll ? (
