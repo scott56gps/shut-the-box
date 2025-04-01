@@ -15,6 +15,7 @@ const GameView = () => {
   const [roll, setRoll] = useState(undefined);
   const [availablePegs, setAvailablePegs] = useState(undefined);
   const [availableNumbers, setAvailableNumbers] = useState(new Set(INITIAL_NUMBERS));
+  const [isGameOver, setIsGameOver] = useState(false);
 
   const rollDice = (min, max) => min + Math.floor(Math.random() * (max - min + 1));
 
@@ -132,6 +133,17 @@ const GameView = () => {
     const total = firstDie + secondDie;
     const availablePairs = findAvailablePairs(total, availableNumbers);
 
+    setRoll({
+      first: firstDie,
+      second: secondDie,
+      total: total,
+    });
+
+    if (availablePairs.size === 0) {
+      setIsGameOver(true);
+      return;
+    }
+
     var colorIndices = generateRandomIndices(COLORS.length);
 
     const newAvailablePegs = [...availablePairs].reduce((accumulator, pair) => {
@@ -141,11 +153,6 @@ const GameView = () => {
       return accumulator;
     }, {});
 
-    setRoll({
-      first: firstDie,
-      second: secondDie,
-      total: total,
-    });
     setAvailablePegs(newAvailablePegs);
   };
 
@@ -158,6 +165,7 @@ const GameView = () => {
     setRoll(undefined);
     setAvailablePegs(undefined);
     setAvailableNumbers(new Set(INITIAL_NUMBERS));
+    setIsGameOver(false);
   };
 
   /**
@@ -215,8 +223,8 @@ const GameView = () => {
         <div className="roll-container">
           {roll ? (
             <>
-              <span key="die1" className="die">Die 1: {roll.first}</span>
-              <span key="die2" className="die">Die 2: {roll.second}</span>
+              <span key="die1" className={`die ${isGameOver && 'game-over-die'}`}>Die 1: {roll.first}</span>
+              <span key="die2" className={`die ${isGameOver && 'game-over-die'}`}>Die 2: {roll.second}</span>
             </>
           ) : (
             <button type="button" onClick={handleRoll}>Roll!</button>
