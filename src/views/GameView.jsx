@@ -224,7 +224,8 @@ const GameView = () => {
           {isGameOver && availablePegs ? (
             <>
               {Object.values(availablePegs).map((peg) => (displayAvailablePeg(peg)))}
-              <span className="peg">{` : ${[...availableNumbers].reduce((accum, number) => accum + number, 0)}`}</span>
+              <span className="peg">{`=`}</span>
+              <span className="peg score">{[...availableNumbers].reduce((accum, number) => accum + number, 0)}</span>
             </>
           ) : [...Array(9)].map((_, i) => {
             return availablePegs && availablePegs[i + 1] ?
