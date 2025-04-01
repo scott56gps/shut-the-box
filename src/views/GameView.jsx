@@ -249,7 +249,7 @@ const GameView = () => {
             <button type="button" onClick={handleRoll}>Roll!</button>
           )}
         </div>
-        <button onClick={handleReset} type="button">Reset</button>
+        <button onClick={handleReset} type="button">{isGameOver ? 'Play Again' : 'Reset'}</button>
       </div>
     </div>
   );
