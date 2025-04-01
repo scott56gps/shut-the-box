@@ -139,21 +139,29 @@ const GameView = () => {
       total: total,
     });
 
-    if (availablePairs.size === 0) {
-      setIsGameOver(true);
-      return;
-    }
-
     var colorIndices = generateRandomIndices(COLORS.length);
 
-    const newAvailablePegs = [...availablePairs].reduce((accumulator, pair) => {
+    const colorPair = (accumulator, pair) => {
       const color = COLORS[colorIndices.pop()];
       accumulator[pair[0]] = generatePegChoice(pair[0], color);
       if (pair[1]) accumulator[pair[1]] = generatePegChoice(pair[1], color);
       return accumulator;
-    }, {});
+    };
+    const colorNumber = (accumulator, number) => {
+      const color = COLORS[colorIndices.pop()];
+      accumulator[number] = generatePegChoice(number, color);
+      return accumulator;
+    };
 
-    setAvailablePegs(newAvailablePegs);
+    if (availablePairs.size === 0) {
+      const finalPegs = [...availableNumbers].reduce(colorNumber, {});
+
+      setAvailablePegs(finalPegs);
+      setIsGameOver(true);
+    } else {
+      const newAvailablePegs = [...availablePairs].reduce(colorPair, {});
+      setAvailablePegs(newAvailablePegs);
+    }
   };
 
   /**
@@ -170,18 +178,21 @@ const GameView = () => {
 
   /**
      Specifies the display for an available peg.
+     SIDE-EFFECT:
+     - If `isGameOver` is true: No mouse events are specified.  Mouse events are added, otherwise.
 
      @param {Object} peg An available peg object
+     @param {Boolean} useMouseEvents True if mouse events should be added to this peg.  False otherwise.
      @returns A JSX element specifying the display of an available peg
    */
   const displayAvailablePeg = (peg) => (
     <span
       className="peg"
-      style={{ backgroundColor: peg.choiceColor, transform: `scale(${peg.scale})` }}
+      style={{ backgroundColor: peg.choiceColor, transform: `${isGameOver ? 'none' : `scale(${peg.scale})`}` }}
       key={peg.number}
-      onClick={() => handlePegSelect(peg)}
-      onMouseEnter={() => handleOnMouseEnter(peg)}
-      onMouseLeave={() => handleOnMouseLeave(peg)}
+      onClick={() => isGameOver ? '' : handlePegSelect(peg)}
+      onMouseEnter={() => isGameOver ? '' : handleOnMouseEnter(peg)}
+      onMouseLeave={() => isGameOver ? '' : handleOnMouseLeave(peg)}
     >
       {peg.number}
     </span>
@@ -210,16 +221,24 @@ const GameView = () => {
     <div className="App">
       <div className="game-board">
         <div className="pegs-container">
-          {[...Array(9)].map((_, i) => {
+          {isGameOver && availablePegs ? (
+            <>
+              {Object.values(availablePegs).map((peg) => (displayAvailablePeg(peg)))}
+              <span className="peg">{`=`}</span>
+              <span className="peg score">{[...availableNumbers].reduce((accum, number) => accum + number, 0)}</span>
+            </>
+          ) : [...Array(9)].map((_, i) => {
             return availablePegs && availablePegs[i + 1] ?
               displayAvailablePeg(availablePegs[i + 1]) :
               displayUnavailablePeg(i + 1, (number) => !availableNumbers.has(number));
           })}
         </div>
-        <div className="selected-pegs-container">
-          {availableNumbers.size < 9 && [...Array(9)].map((_, i) =>
+        {!isGameOver && (
+          <div className="selected-pegs-container">
+            {availableNumbers.size < 9 && [...Array(9)].map((_, i) =>
             displayUnavailablePeg(i + 1, (number) => availableNumbers.has(number)))}
-        </div>
+          </div>
+        )}
         <div className="roll-container">
           {roll ? (
             <>
@@ -230,7 +249,7 @@ const GameView = () => {
             <button type="button" onClick={handleRoll}>Roll!</button>
           )}
         </div>
-        <button onClick={handleReset} type="button">Reset</button>
+        <button onClick={handleReset} type="button">{isGameOver ? 'Play Again' : 'Reset'}</button>
       </div>
     </div>
   );
