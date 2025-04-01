@@ -178,19 +178,21 @@ const GameView = () => {
 
   /**
      Specifies the display for an available peg.
+     SIDE-EFFECT:
+     - If `isGameOver` is true: No mouse events are specified.  Mouse events are added, otherwise.
 
      @param {Object} peg An available peg object
      @param {Boolean} useMouseEvents True if mouse events should be added to this peg.  False otherwise.
      @returns A JSX element specifying the display of an available peg
    */
-  const displayAvailablePeg = (peg, useMouseEvents) => (
+  const displayAvailablePeg = (peg) => (
     <span
       className="peg"
-      style={{ backgroundColor: peg.choiceColor, transform: `scale(${peg.scale})` }}
+      style={{ backgroundColor: peg.choiceColor, transform: `${isGameOver ? 'none' : `scale(${peg.scale})`}` }}
       key={peg.number}
-      onClick={() => useMouseEvents ? handlePegSelect(peg) : ''}
-      onMouseEnter={() => useMouseEvents ? handleOnMouseEnter(peg) : ''}
-      onMouseLeave={() => useMouseEvents ? handleOnMouseLeave(peg) : ''}
+      onClick={() => isGameOver ? '' : handlePegSelect(peg)}
+      onMouseEnter={() => isGameOver ? '' : handleOnMouseEnter(peg)}
+      onMouseLeave={() => isGameOver ? '' : handleOnMouseLeave(peg)}
     >
       {peg.number}
     </span>
