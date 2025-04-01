@@ -139,21 +139,29 @@ const GameView = () => {
       total: total,
     });
 
-    if (availablePairs.size === 0) {
-      setIsGameOver(true);
-      return;
-    }
-
     var colorIndices = generateRandomIndices(COLORS.length);
 
-    const newAvailablePegs = [...availablePairs].reduce((accumulator, pair) => {
+    const colorPair = (accumulator, pair) => {
       const color = COLORS[colorIndices.pop()];
       accumulator[pair[0]] = generatePegChoice(pair[0], color);
       if (pair[1]) accumulator[pair[1]] = generatePegChoice(pair[1], color);
       return accumulator;
-    }, {});
+    };
+    const colorNumber = (accumulator, number) => {
+      const color = COLORS[colorIndices.pop()];
+      accumulator[number] = generatePegChoice(number, color);
+      return accumulator;
+    };
 
-    setAvailablePegs(newAvailablePegs);
+    if (availablePairs.size === 0) {
+      const finalPegs = [...availableNumbers].reduce(colorNumber, {});
+
+      setAvailablePegs(finalPegs);
+      setIsGameOver(true);
+    } else {
+      const newAvailablePegs = [...availablePairs].reduce(colorPair, {});
+      setAvailablePegs(newAvailablePegs);
+    }
   };
 
   /**
@@ -172,16 +180,17 @@ const GameView = () => {
      Specifies the display for an available peg.
 
      @param {Object} peg An available peg object
+     @param {Boolean} useMouseEvents True if mouse events should be added to this peg.  False otherwise.
      @returns A JSX element specifying the display of an available peg
    */
-  const displayAvailablePeg = (peg) => (
+  const displayAvailablePeg = (peg, useMouseEvents) => (
     <span
       className="peg"
       style={{ backgroundColor: peg.choiceColor, transform: `scale(${peg.scale})` }}
       key={peg.number}
-      onClick={() => handlePegSelect(peg)}
-      onMouseEnter={() => handleOnMouseEnter(peg)}
-      onMouseLeave={() => handleOnMouseLeave(peg)}
+      onClick={() => useMouseEvents ? handlePegSelect(peg) : ''}
+      onMouseEnter={() => useMouseEvents ? handleOnMouseEnter(peg) : ''}
+      onMouseLeave={() => useMouseEvents ? handleOnMouseLeave(peg) : ''}
     >
       {peg.number}
     </span>
@@ -212,14 +221,17 @@ const GameView = () => {
         <div className="pegs-container">
           {[...Array(9)].map((_, i) => {
             return availablePegs && availablePegs[i + 1] ?
-              displayAvailablePeg(availablePegs[i + 1]) :
+              displayAvailablePeg(availablePegs[i + 1], !isGameOver) :
               displayUnavailablePeg(i + 1, (number) => !availableNumbers.has(number));
           })}
+          {isGameOver && (<span className="peg">{`Score : ${[...availableNumbers].reduce((accum, number) => accum + number, 0)}`}</span>)}
         </div>
-        <div className="selected-pegs-container">
-          {availableNumbers.size < 9 && [...Array(9)].map((_, i) =>
+        {!isGameOver && (
+          <div className="selected-pegs-container">
+            {availableNumbers.size < 9 && [...Array(9)].map((_, i) =>
             displayUnavailablePeg(i + 1, (number) => availableNumbers.has(number)))}
-        </div>
+          </div>
+        )}
         <div className="roll-container">
           {roll ? (
             <>
