@@ -221,12 +221,16 @@ const GameView = () => {
     <div className="App">
       <div className="game-board">
         <div className="pegs-container">
-          {[...Array(9)].map((_, i) => {
+          {isGameOver && availablePegs ? (
+            <>
+              {Object.values(availablePegs).map((peg) => (displayAvailablePeg(peg)))}
+              <span className="peg">{` : ${[...availableNumbers].reduce((accum, number) => accum + number, 0)}`}</span>
+            </>
+          ) : [...Array(9)].map((_, i) => {
             return availablePegs && availablePegs[i + 1] ?
-              displayAvailablePeg(availablePegs[i + 1], !isGameOver) :
+              displayAvailablePeg(availablePegs[i + 1]) :
               displayUnavailablePeg(i + 1, (number) => !availableNumbers.has(number));
           })}
-          {isGameOver && (<span className="peg">{`Score : ${[...availableNumbers].reduce((accum, number) => accum + number, 0)}`}</span>)}
         </div>
         {!isGameOver && (
           <div className="selected-pegs-container">
