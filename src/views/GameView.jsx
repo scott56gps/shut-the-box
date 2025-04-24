@@ -29,17 +29,25 @@ const GameView = () => {
      @param {Object} peg A peg object that is selected
    */
   const handlePegSelect = (peg) => {
+    var selectedPegFilter;
     if (peg.number !== roll.total) {
       // There is a match to find
       const matchKey = roll.total - peg.number;
       const pegMatch = availablePegs[matchKey];
 
-      setAvailableNumbers(new Set([...availableNumbers].filter((number) =>
-        number !== peg.number && number !== pegMatch.number)));
+      selectedPegFilter = (number) => number !== peg.number &&
+        number !== pegMatch.number;
     } else {
-      setAvailableNumbers(new Set([...availableNumbers].filter((number) =>
-        number !== peg.number)));
+      selectedPegFilter = (number) => number !== peg.number
     }
+
+    const newAvailableNumbers = new Set([...availableNumbers].filter(selectedPegFilter));
+
+    // Check to see "Shut The Box" status (all the available numbers are gone)
+    if (newAvailableNumbers.size === 0) {
+      setIsGameOver(true);
+    }
+    setAvailableNumbers(newAvailableNumbers);
     setAvailablePegs(undefined);
     setRoll(undefined);
   }
@@ -227,7 +235,7 @@ const GameView = () => {
               <span className="peg">{`=`}</span>
               <span className="peg score">{[...availableNumbers].reduce((accum, number) => accum + number, 0)}</span>
             </>
-          ) : [...Array(9)].map((_, i) => {
+          ) : isGameOver && availableNumbers.size === 0 ? (<div>You Shut the box!</div>) : [...Array(9)].map((_, i) => {
             return availablePegs && availablePegs[i + 1] ?
               displayAvailablePeg(availablePegs[i + 1]) :
               displayUnavailablePeg(i + 1, (number) => !availableNumbers.has(number));
