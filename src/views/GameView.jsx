@@ -20,6 +20,49 @@ const GameView = () => {
   const rollDice = (min, max) => min + Math.floor(Math.random() * (max - min + 1));
 
   /**
+     Handles effect for when the roll button is pressed.
+     SIDE EFFECTS:
+     - Specifies dice roll
+     - Specifies available pegs based on the dice roll performed
+   */
+  const handleRoll = () => {
+    const firstDie = rollDice(1, 6);
+    const secondDie = rollDice(1, 6);
+    const total = firstDie + secondDie;
+    const availablePairs = findAvailablePairs(total, availableNumbers);
+
+    setRoll({
+      first: firstDie,
+      second: secondDie,
+      total: total,
+    });
+
+    var colorIndices = generateRandomIndices(COLORS.length);
+
+    const colorPair = (accumulator, pair) => {
+      const color = COLORS[colorIndices.pop()];
+      accumulator[pair[0]] = generatePegChoice(pair[0], color);
+      if (pair[1]) accumulator[pair[1]] = generatePegChoice(pair[1], color);
+      return accumulator;
+    };
+    const colorNumber = (accumulator, number) => {
+      const color = COLORS[colorIndices.pop()];
+      accumulator[number] = generatePegChoice(number, color);
+      return accumulator;
+    };
+
+    if (availablePairs.size === 0) {
+      const finalPegs = [...availableNumbers].reduce(colorNumber, {});
+
+      setAvailablePegs(finalPegs);
+      setIsGameOver(true);
+    } else {
+      const newAvailablePegs = [...availablePairs].reduce(colorPair, {});
+      setAvailablePegs(newAvailablePegs);
+    }
+  };
+
+  /**
      Handles effect for when a peg is selected.
      SIDE EFFECTS:
      - Removes the number for the given peg from availableNumbers
@@ -128,49 +171,6 @@ const GameView = () => {
       scale: '1',
     };
   }, []);
-
-  /**
-     Handles effect for when the roll button is pressed.
-     SIDE EFFECTS:
-     - Specifies dice roll
-     - Specifies available pegs based on the dice roll performed
-   */
-  const handleRoll = () => {
-    const firstDie = rollDice(1, 6);
-    const secondDie = rollDice(1, 6);
-    const total = firstDie + secondDie;
-    const availablePairs = findAvailablePairs(total, availableNumbers);
-
-    setRoll({
-      first: firstDie,
-      second: secondDie,
-      total: total,
-    });
-
-    var colorIndices = generateRandomIndices(COLORS.length);
-
-    const colorPair = (accumulator, pair) => {
-      const color = COLORS[colorIndices.pop()];
-      accumulator[pair[0]] = generatePegChoice(pair[0], color);
-      if (pair[1]) accumulator[pair[1]] = generatePegChoice(pair[1], color);
-      return accumulator;
-    };
-    const colorNumber = (accumulator, number) => {
-      const color = COLORS[colorIndices.pop()];
-      accumulator[number] = generatePegChoice(number, color);
-      return accumulator;
-    };
-
-    if (availablePairs.size === 0) {
-      const finalPegs = [...availableNumbers].reduce(colorNumber, {});
-
-      setAvailablePegs(finalPegs);
-      setIsGameOver(true);
-    } else {
-      const newAvailablePegs = [...availablePairs].reduce(colorPair, {});
-      setAvailablePegs(newAvailablePegs);
-    }
-  };
 
   /**
      Handles effect for when the reset button is pressed.
