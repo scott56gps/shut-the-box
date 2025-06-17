@@ -7,6 +7,7 @@ const findAvailablePairs = require('../utils/findAvailablePairs');
 
 const UNSET = 'unset';
 const INITIAL_SCALE = '1';
+const INITIAL_Z_INDEX = '0';
 const COLORS = ["#0020FF", "#FF009F", "#FFDF00", "#00FF60", "#00DFFF"];
 const MAGNIFIED_SCALE = 1.3;
 const INITIAL_NUMBERS = [1, 2, 3, 4, 5, 6, 7, 8, 9];
@@ -107,12 +108,14 @@ const GameView = () => {
   const handleOnMouseEnter = (peg) => {
     // We want the current peg to be scaled
     peg.scale = `${MAGNIFIED_SCALE}`;
+    peg.zIndex = 1;
 
     // AND its match
     if (peg.number !== roll.total) {
       const matchKey = roll.total - peg.number;
       const pegMatch = availablePegs[matchKey];
       pegMatch.scale = `${MAGNIFIED_SCALE}`;
+      pegMatch.zIndex = 1;
 
       setAvailablePegs({
         ...availablePegs,
@@ -138,11 +141,13 @@ const GameView = () => {
   */
   const handleOnMouseLeave = (peg) => {
     peg.scale = INITIAL_SCALE;
+    peg.zIndex = INITIAL_Z_INDEX;
 
     if (peg.number !== roll.total) {
       const matchKey = roll.total - peg.number;
       const pegMatch = availablePegs[matchKey];
       pegMatch.scale = INITIAL_SCALE;
+      pegMatch.zIndex = INITIAL_Z_INDEX;
 
       setAvailablePegs({
         ...availablePegs,
@@ -168,7 +173,8 @@ const GameView = () => {
     return {
       number: number,
       choiceColor: color,
-      scale: '1',
+      scale: INITIAL_SCALE,
+      zIndex: INITIAL_Z_INDEX,
     };
   }, []);
 
@@ -196,7 +202,7 @@ const GameView = () => {
   const displayAvailablePeg = (peg) => (
     <span
       className="peg"
-      style={{ backgroundColor: peg.choiceColor, transform: `${isGameOver ? 'none' : `scale(${peg.scale})`}` }}
+      style={{ backgroundColor: peg.choiceColor, transform: `${isGameOver ? 'none' : `scale(${peg.scale})`}`, zIndex: peg.zIndex }}
       key={peg.number}
       onClick={() => isGameOver ? '' : handlePegSelect(peg)}
       onMouseEnter={() => isGameOver ? '' : handleOnMouseEnter(peg)}
