@@ -21,8 +21,8 @@ const findAvailablePairs = (sum, available) => {
    N and M.  N and M must not be the same.  If N and M are the same, an empty
    set is returned.
 
-   @param {Number} N The lower component of a sum
-   @param {Number} M The upper component of a sum
+   @param {Number} N The lower component of the closest numbers that add to a sum
+   @param {Number} M The upper component of the closest numbers that add to a sum
    @param {Set} choiceSet A set of numbers that represent possible choices
    @param {Set} available An array of available numbers to choose from.
    @returns {Set} A Set object containing possible combinations of numbers.
